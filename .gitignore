@@ -1,0 +1,47 @@
+# Obsidian
+# .obsidian/  # 我们选择跟踪配置，所以不忽略
+
+# Claude Code memory
+.claude/
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editor and IDE
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+
+# Temporary files
+*.tmp
+*.temp
+
+# Logs
+*.log
+
+# Node modules (if any)
+node_modules/
+
+# Backup files
+*.bak
+*.backup
+
+# 忽略可能包含敏感信息的文件
+secrets.*
+.env
+*.key
+*.pem
+
+# 大型媒体文件（可选）
+# *.mp4
+# *.avi
+# *.mov

@@ -1,0 +1,211 @@
+### 前言
+- 在学习Web攻防时，不可避免会涉及到抓包、流量监控，而Burpsuite就是一个广泛应用于发现和利用Web应用中的漏洞。因此，为了便于我之后的使用与复习，我把它的重点部分作了一个总结，至于其他大而全的知识点，读者可以去网上或官网具体了解一下。
+### 简介
+- 由英国 PortSwigger 公司开发，充当着客户端和服务器之间的"中间人"，让你能清晰地看到、分析和修改它们之间传输的所有信息，从而发现潜在的安全漏洞，它将众多测试工具集成在一个平台下，你可以把它的"代理"模块作为一切操作的起点，捕获到感兴趣的请求后，可以随时"发送"给其他工具进行深度测试。
+### 界面
+- 项目创建或打开界面
+	- 图示![[{83480065-54FB-4142-AA1B-57696B302783}.png]]
+	-  Temporary project（临时项目）
+	    - 作用：创建一个**不保存到磁盘**的临时项目。所有测试数据（拦截历史、扫描结果等）仅存在于内存中，关闭 Burp Suite 后数据就会丢失。
+	    - 适用场景：快速测试、临时验证、学习练习。对于初学者，通常选这个即可，省去管理项目文件的麻烦。
+	- New project on disk（在磁盘上新建项目）
+	    - 作用：创建一个新的项目文件（`.burp` 文件），将本次测试的所有数据保存到该文件中，下次可以再次打开继续测试。
+	    - 适用场景：长时间、分阶段的大型测试，或者需要保留证据和报告的项目。
+	    - 需要填写：`Name`（项目名称）、`File`（项目文件保存路径）。你需要指定一个文件名和位置。
+	- Open existing project（打开已有项目）
+	    - 作用：打开之前保存的 `.burp` 项目文件，继续之前的测试工作。
+	    - 适用场景：继续未完成的测试任务，或者查看历史记录
+	-  Pause Automated Tasks（暂停自动化任务）
+		- 如果勾选此复选框，项目加载后，所有自动化的任务（如主动扫描、实时审计）会被暂时挂起，不会立即运行。你可以稍后在 Dashboard 中手动启动它们。这对于需要先配置好一切再开始扫描的场景很有用。
+- 选项项目配置界面
+	- 图示![[{E090EF5F-0F09-42BE-A205-D5856ECABFCE}.png]]
+	- Use Burp defaults（使用 Burp 默认设置）
+	    - 作用：使用 Burp Suite 出厂时的默认配置。这是最安全、最干净的选择，适合大多数情况。
+	    - 推荐：初学者和日常测试通常选这个，避免因为加载了不熟悉的旧配置而导致问题。
+	- Use settings saved with project（使用保存在项目中的设置）
+	    - 作用：仅当你在打开一个之前保存的项目文件时，此选项才可用。它会加载该 `.burp` 文件自身附带的配置。这在你需要延续上一次测试的精确环境时非常有用。
+	- Load from configuration file（从配置文件加载）
+	    - 作用：从外部的 `.json` 或 `.burp` 配置文件中加载设置。你可以预先保存一份自己调教好的配置文件（例如，包含自定义的证书、代理监听器、特定的扫描选项），然后在多个项目中重复使用，实现配置的标准化。
+	    - 需要：点击 `Choose file...` 选择配置文件
+- 项目运行界面
+	- 图示![[{A9443BB7-B280-4E20-9DC5-58B70EAAEEAE}.png]]
+	- Dashboard（专业版）: 自动化任务中心，管理扫描、审计，查看问题与日志。
+	- Target: 定义测试范围（Scope），以树形展示站点地图（Site Map）。
+	- Proxy: 拦截/修改HTTP/HTTPS流量，含Intercept（开关）、HTTP History（历史）、Options（设置）。
+	- Intruder: 自动化攻击工具（爆破、枚举、模糊测试），设置攻击位置和载荷。
+	- Repeater: 手动重放、修改单个请求，观察响应变化。
+	- Collaborator（专业版）: 检测带外漏洞（如Blind SQLi），通过外部服务器捕获交互。
+	- Sequencer: 分析令牌随机性，判断是否可预测。
+	- Decoder: 编解码与哈希工具（URL、Base64、MD5等）。
+	- Comparer: 对比两个请求/响应的差异，高亮显示。
+	- Logger（专业版）: 全局流量日志，记录所有请求/响应，支持筛选导出。
+	- Organizer（专业版）: 整理测试点，添加注释，生成报告。
+	- Extensions: 加载第三方扩展（BApp），增强功能。
+	- Learn（专业版）: 内置教程和Web Security Academy入口。
+### 配置
+- 代理
+	- 监听器设置
+		- 图示![[{DCA47865-D597-4B52-AE21-4DFA21CDD406}.png]]
+		- 在`proxy settings`中的`proxy listeners`中可以设置绑定代理的IP和端口
+	- 其他代理设置
+		- 见其他博客
+- SSL/TLS证书安装
+	- 图示![[{4E6FA28B-2F49-409B-AD82-9B6176EA6F33}.png]]
+	 ![[{3F51B7B6-CDF8-46CB-957C-2D647238B17A}.png]]
+	- 下载证书
+		- 点击`import/export CA certificate`
+		- 选择`Certufucate in DER format`
+		- 下载到电脑某个目录，取名为burp.der
+	- 安装证书到浏览器
+		- 打开设置的查看证书选项
+		- 导入下载的证书
+		- 信任此证书颁发机构来标识网站
+- Scope范围
+	- 作用
+		- 测试时，浏览器会加载许多第三方资源（如Google Analytics、CDN），这些流量会污染你的历史记录。定义Scope（范围）后，Burp可以高亮显示目标请求，甚至只拦截范围内的请求
+	- 配置
+		- 图示				![[{2D3F41C8-1127-462D-8FD2-201EC437A95B}.png]] 				![[{4DD971F4-0D07-4AC1-AF6B-C8FF06521BFA}.png]]
+		- 方法一：在 `Target` -> `Site Map` 中，右键点击目标域名，选择“Add to Scope”。
+		- 方法二：在 `Target` -> `Scope` 标签中，手动输入域名或IP，支持通配符（如 `*.example.com`）。
+	- 使用
+		- 在 `Proxy` -> `HTTP History` 中，点击“Filter”栏，勾选“Show only in-scope items”，历史记录将只显示目标流量。
+		- 在 `Intercept` 标签中，可设置“Intercept rules based on scope”，选择“Only in-scope items”以仅拦截目标请求
+### 使用
+- Dashboard
+	- **启动新扫描**：点击 `New Scan`，选择扫描类型（主动扫描、被动爬行等），配置目标 URL 和扫描选项
+	- **监控任务**：在 Tasks 面板中查看运行中的任务，可暂停、恢复或终止
+	- **查看问题**：Issue activity 面板会实时显示发现的漏洞，点击可查看详情
+	- **过滤日志**：Event log 面板记录工具日志，可按级别筛选
+	- 图示![[{E02AE464-612E-4551-9099-6011F984815B}.png]]
+	- ![[{886F798F-F50C-46C1-827B-A5A5FE6962EC}.png]]
+- Target
+	- **添加目标到 Scope**：
+	    - 方法一：在 `Site Map` 中右键目标域名，选择 `Add to Scope`
+	    - 方法二：进入 `Scope` 子标签，手动输入域名或 IP（支持通配符，如 `*.example.com`）
+	- **查看站点地图**：
+	    - 在 `Site Map` 中，Burp 会以树形结构展示所有访问过的 URL，可展开查看每个请求的详细信息
+	    - 右键某个节点可发送到 Repeater、Intruder 等模块
+	- **使用 Scope 过滤**：
+	    - 在 Proxy 的 HTTP History 中，点击 Filter 栏，勾选 `Show only in-scope items`，历史记录将只显示目标流量。
+	    - 在 Intercept 中可设置仅拦截 Scope 内的请求
+	- 图示![[{9DF764E4-0D54-4426-A9CF-371F066AF791}.png]]
+- Proxy
+	- **确认代理监听器**：进入 `Proxy` -> `Options`，确保 `127.0.0.1:8080` 处于运行状态
+	- **配置浏览器代理**：将浏览器代理指向上述地址（推荐使用 FoxyProxy 快速切换）
+	- **安装 CA 证书**：访问 `http://burp` 下载 `cacert.der` 并导入浏览器，以解密 HTTPS 流量。
+	- **开启拦截**：在 `Intercept` 子标签中点击 `Intercept is on`（按钮变蓝）
+	- **浏览目标网站**：浏览器中访问目标，请求会被暂停在 Intercept 界面
+	- **修改请求/响应**：在 Intercept 中直接修改内容（如改变参数值），然后点击 `Forward` 放行，或 `Drop` 丢弃
+	- **查看历史**：操作完成后，可在 `HTTP History` 中查看所有请求/响应的详细信息，支持筛选、搜索
+	- 图示![[{EFF65EC0-64BA-4E14-AC5C-DA4FB11C55C1}.png]]
+- Intruder
+	- **发送请求到 Intruder**：在 Proxy History 或 Site Map 中右键请求，选择 `Send to Intruder`
+	- **配置攻击位置（Positions）**：
+	    - 清除自动标记：点击 `Clear §`。
+	    - 手动标记需要枚举的参数值：选中参数值（如 `password=123` 中的 `123`），点击 `Add §`。
+    - 选择攻击类型：
+        - **Sniper**：使用一个字典，依次替换每个标记位置（适合单参数爆破）。
+        - **Battering ram**：所有标记位置同时使用同一个字典值。
+        - **Pitchfork**：多个标记位置分别使用不同字典，并行对应（字典行数需一致）。
+        - **Cluster bomb**：多个标记位置使用不同字典，进行笛卡尔积组合。
+	- **配置载荷（Payloads）**：
+	    - 在 Payloads 标签中，选择要设置的 Payload 位置。
+	    - 点击 `Add` 添加载荷：可手动输入、从文件加载、使用内置列表（如数字、常用密码）。
+	    - 可设置处理规则（如大小写转换、编码）和结果匹配规则（如根据响应长度筛选）。
+	- **调整选项（Options）**：
+	    - 设置线程数（建议 5-20）、重试次数、Grep 匹配等。
+	- **启动攻击**：点击右上角 `Start attack`，实时查看结果，找出响应长度或状态码异常的条目。
+- Repeater
+	- **发送请求到 Repeater**：在 Proxy History 或 Site Map 中右键请求，选择 `Send to Repeater`
+	- **切换到 Repeater 标签**：你会看到请求出现在左侧编辑区。
+	- **修改请求**：任意修改请求行、头或正文（例如将 `id=1` 改为 `id=1'`）。
+	- **点击“Go”发送**：右侧显示服务器响应，观察变化。
+	- **反复测试**：根据响应调整攻击向量，多次尝试。
+	- **多标签管理**：可同时打开多个 Repeater 标签，分别测试不同请求。
+- Collaborator
+	- **生成 Collaborator 地址**：
+	    - 在 Collaborator 标签中，点击 `Copy to clipboard` 复制一个唯一地址（如 `http://xxxx.burpcollaborator.net`）。
+	- **注入地址到请求**：
+	    - 将地址注入到可能触发带外交互的参数中（例如 `http://target/page?param=http://xxxx.burpcollaborator.net`）。
+	- **发送请求**：通过 Repeater 或 Intruder 发送请求。
+	- **检查交互**：返回 Collaborator 标签，点击 `Poll now`，如果有交互（如 DNS 查询、HTTP 请求），会显示在列表中，证明漏洞存在。
+- Sequencer
+	- **捕获令牌**：找到返回令牌的请求（如登录后返回的 Cookie 中的 `JSESSIONID`），右键 `Send to Sequencer`。
+	- **配置捕获**：
+	    - 在 Sequencer 中，选择令牌位置（如 Cookie、表单字段）。
+	    - 可手动指定令牌名称，或让 Burp 自动识别。
+	- **开始捕获**：点击 `Start live capture`，Burp 会自动反复发送请求收集样本。建议收集至少 100 个。
+	- **停止并分析**：点击 `Stop`，然后点击 `Analyze now`。
+	- **查看结果**：报告显示熵值、字符分布、统计测试结果。如果熵值较低或存在明显规律，说明令牌可预测。
+- Decoder
+	- **输入数据**：在顶部输入框粘贴需要处理的数据。
+	- **选择操作**：
+	    - **Decode as**：选择解码格式（如 Base64）。
+	    - **Encode as**：选择编码格式（如 URL 编码）。
+	    - **Hash**：选择哈希算法（如 MD5）。
+	- **查看结果**：输出框实时显示处理结果。
+	- **嵌套处理**：点击输出框下方的 `Decode as` 或 `Encode as`，可对结果进一步处理
+- Comparator
+	- **选择数据**：在任意模块（如 Proxy History、Repeater 结果）中，按住 Ctrl 选中两个（或多个）请求/响应。
+	- **发送到 Comparator**：右键 -> `Send to Comparator`。
+	- **切换到 Comparator 标签**：看到已添加的数据项列表。
+	- **对比**：选中两个数据项，点击 `Compare`，选择按 **单词** 或 **字节** 对比。
+	- **查看差异**：新窗口并排显示，差异部分高亮。
+- Logger
+	- **查看日志**：进入 Logger 标签，所有请求/响应按时间顺序排列。
+	- **筛选**：点击 Filter 栏，可按域名、方法、状态码、工具来源（Proxy、Repeater 等）筛选。
+	- **搜索**：在日志中搜索关键词。
+	- **导出**：右键可导出为 CSV 或复制到剪贴板。
+- Organizer
+	- **发送到 Organizer**：在任意请求上右键 -> `Send to Organizer`。
+	- **管理条目**：在 Organizer 标签中，可查看所有保存的条目，添加注释、标记状态（如“已确认”、“待测试”）。
+	- **生成报告**：可选中多个条目，导出为 HTML 报告，包含请求/响应和注释
+- Extensions
+	- **打开 BApp Store**：在 `Extensions` -> `BApp Store` 中浏览可用的扩展。
+	- **安装扩展**：点击扩展下方的 `Install` 按钮，Burp 自动下载并启用。
+	- **管理已安装扩展**：在 `Installed` 子标签中，可启用/禁用、卸载扩展。
+	- **使用扩展**：安装后，扩展通常会在界面中添加新标签或右键菜单，按说明使用。
+### 使用流程
+- 场景
+	- 目标网站：`http://testphp.vulnweb.com/login.php`，需要测试是否存在 SQL 注入，并爆破管理员密码
+- 步骤 1：配置代理并抓包（Proxy）
+	- 启动 Burp，确保代理监听 `127.0.0.1:8080`
+	- 配置浏览器代理指向 Burp（使用 FoxyProxy 切换到 Burp 配置）
+	- 访问 `http://testphp.vulnweb.com/login.php`
+	- 在登录页面输入任意用户名密码（如 admin / 123），点击登录
+	- 在 Burp 的 `Proxy` -> `Intercept` 中看到拦截的请求：
+	    `POST /login.php HTTP/1.1`
+	    `Host: testphp.vulnweb.com`
+	    `...`
+	    `uname=admin&pass=123`
+	- 右键点击该请求，选择 `Send to Repeater`（用于后续手工测试）
+- 步骤 2：手工测试 SQL 注入（Repeater）
+	- 切换到 `Repeater` 标签，看到刚才的请求
+	- 修改 `pass=123` 为 `pass=123'`，点击 `Go`
+	- 观察响应：如果返回数据库错误（如“You have an error in your SQL syntax”），则可能存在 SQL 注入
+	- 进一步测试：修改为 `pass=123' or '1'='1`，若响应显示登录成功，则确认存在注入点
+	- 记录注入点信息，准备利用
+ - 步骤 3：爆破密码（Intruder）
+	- 回到 `Proxy` -> `HTTP History`，找到原始登录请求，右键 `Send to Intruder`。
+	- 在 Intruder 的 `Positions` 标签中，清除所有标记（`Clear §`），然后选中 `pass=123` 中的 `123`，点击 `Add §`
+	- 攻击类型选择 **Sniper**
+	- 切换到 `Payloads` 标签，点击 `Add` 加载一个密码字典（例如从 `SecLists` 中选取常见密码列表）
+	- 切换到 `Options` 标签，在 `Grep - Match` 中添加关键词（例如“Welcome”、“dashboard”），用于标记成功登录的响应
+	- 点击 `Start attack`，开始爆破
+	- 攻击完成后，查看结果，找出响应长度或状态码与众不同的条目，并检查是否包含匹配的关键词。找到成功密码
+ - 步骤 4：解码可能的编码（Decoder）
+	- 假设在请求或响应中遇到 Base64 编码的数据（如 JWT），可复制到 `Decoder` 中解码查看
+- 步骤 5：比较响应（Comparator）
+	- 如果爆破时需要对比不同密码返回的响应，可将两个响应发送到 `Comparator` 找出差异，用于优化匹配规则。
+ - 步骤 6：分析会话令牌（Sequencer）
+	- 如果登录成功后返回的 Cookie 中包含 `JSESSIONID`，可将其发送到 `Sequencer` 分析随机性，判断是否存在会话固定漏洞。
+- 步骤 7：整理发现（Organizer，专业版）
+	- 将关键的请求（如注入点、爆破成功的请求）发送到 `Organizer`，添加注释，便于后续撰写报告。
+ - 步骤 8：扩展增强（Extensions）
+	- 安装 `JSON Beautifier` 扩展，方便查看 API 返回的 JSON 数据。安装 `Turbo Intruder` 进行更高效的爆破
+ - 步骤 9：日志回顾（Logger，专业版）
+	- 在测试过程中，可随时查看 `Logger` 标签，回顾所有模块发出的请求，确保没有遗漏
+ - 步骤 10：保存项目
+	- 测试完成后，可在 `Project` 菜单中保存项目文件（`.burp`），以便后续查看或继续测试
+### 结语
+- Burpsuite这款抓包工具功能强大，核心的模块就那么几个，用好Proxy、Repeater等模块就大部分场景而言已经够用了

@@ -1,0 +1,213 @@
+{
+  "main": {
+    "id": "8ead392c90783b2b",
+    "type": "split",
+    "children": [
+      {
+        "id": "d4f9549fd5e7afdb",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "47c6feeee8915f8b",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "02 Sec/13 Tool/04 SqlMap.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "04 SqlMap"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "7e51f2b4548a88dc",
+    "type": "split",
+    "children": [
+      {
+        "id": "ecaf3078b816af63",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "b06185dfe9e45113",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "文件列表"
+            }
+          },
+          {
+            "id": "20b612e81a8ed954",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "搜索"
+            }
+          },
+          {
+            "id": "11dc279d8f3f365b",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "书签"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "bec6907571ce661d",
+    "type": "split",
+    "children": [
+      {
+        "id": "cecedbe4155bf5d0",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "7fe89dc52aa05c9b",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "02 Sec/13 Tool/04 SqlMap.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "04 SqlMap 的反向链接列表"
+            }
+          },
+          {
+            "id": "d4859c667584c1a8",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "02 Sec/13 Tool/04 SqlMap.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "04 SqlMap 的出链列表"
+            }
+          },
+          {
+            "id": "9c3d1a945501e8d6",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "标签"
+            }
+          },
+          {
+            "id": "fc22faae3ec4adee",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "添加笔记属性"
+            }
+          },
+          {
+            "id": "7ef47c5856266f50",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "02 Sec/13 Tool/04 SqlMap.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "04 SqlMap 的大纲"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:打开快速切换": false,
+      "graph:查看关系图谱": false,
+      "canvas:新建白板": false,
+      "daily-notes:打开/创建今天的日记": false,
+      "templates:插入模板": false,
+      "command-palette:打开命令面板": false,
+      "bases:新建数据库": false
+    }
+  },
+  "active": "47c6feeee8915f8b",
+  "lastOpenFiles": [
+    "02 Sec/13 Tool/03 BurpSuite.md",
+    "02 Sec/13 Tool/04 SqlMap.md",
+    "01 Link/{EFF65EC0-64BA-4E14-AC5C-DA4FB11C55C1}.png",
+    "01 Link/{9DF764E4-0D54-4426-A9CF-371F066AF791}.png",
+    "01 Link/{886F798F-F50C-46C1-827B-A5A5FE6962EC}.png",
+    "01 Link/{E02AE464-612E-4551-9099-6011F984815B}.png",
+    "01 Link/{4DD971F4-0D07-4AC1-AF6B-C8FF06521BFA}.png",
+    "01 Link/{2D3F41C8-1127-462D-8FD2-201EC437A95B}.png",
+    "01 Link/{3F51B7B6-CDF8-46CB-957C-2D647238B17A}.png",
+    "01 Link/{4E6FA28B-2F49-409B-AD82-9B6176EA6F33}.png",
+    "01 Link/{DCA47865-D597-4B52-AE21-4DFA21CDD406}.png",
+    "01 Link/{A9443BB7-B280-4E20-9DC5-58B70EAAEEAE}.png",
+    "02 Sec/13 Tool/02 Git.md",
+    "Link",
+    "02 Sec/13 Tool/01 Docker.md",
+    "02 Sec/12 InternalNetworkConfrontation",
+    "02 Sec/11 AntiKilling",
+    "02 Sec/10 PrivilegeEscalation",
+    "02 Sec/09 CodeAudit",
+    "02 Sec/08 VulnerabilityDiscovery",
+    "02 Sec/07 Cloud",
+    "02 Sec/06 System",
+    "02 Sec/05 API",
+    "02 Sec/04 APP"
+  ]
+}

