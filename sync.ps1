@@ -46,7 +46,8 @@ try {
 
     Write-Host "同步完成!" -ForegroundColor Green
 
-} catch {
+}
+catch {
     Write-Host "同步过程中出现错误: $_" -ForegroundColor Red
     Write-Host "错误详情: $($_.Exception.Message)" -ForegroundColor Red
     exit 1

@@ -206,6 +206,30 @@ Because the workspace file can differ across devices, it may cause merge conflic
 - **Sync frequency** – The user prefers that Claude runs the sync scripts when they ask to update notes, rather than them running the scripts themselves.
 - **User identity** – Git is configured as `luodapao <luodapaohhh@outlook.com>`.
 
+## Git Operations Policy
+
+**CRITICAL: Authorization Required for All Git Operations**
+
+1. **Sync Operations**:
+   - **NEVER** run sync scripts (sync.ps1, sync.sh, sync.bat) unless the user explicitly asks you to "sync", "update notes", or "push changes"
+   - **NEVER** automatically commit or push changes after editing notes
+   - **WAIT** for explicit user instruction before performing any git operations
+
+2. **Exception Cases**:
+   - Only perform git operations if the user's request contains clear verbs like:
+     - "同步笔记" (sync notes)
+     - "更新到GitHub" (update to GitHub)  
+     - "提交更改" (commit changes)
+     - "推送" (push)
+   - If uncertain, ASK the user before proceeding
+
+3. **Editing vs. Syncing**:
+   - Editing/optimizing notes ≠ automatic syncing
+   - Complete the editing task first, then wait for sync instruction
+   - The user may want to review changes before committing
+
+**Violation Example**: After optimizing notes, DO NOT run `git add`, `git commit`, or `git push` unless explicitly instructed.
+
 ## Reference
 
 - `SYNC_GUIDE.md` – Detailed synchronization setup guide.
