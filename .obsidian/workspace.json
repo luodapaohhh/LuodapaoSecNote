@@ -13,12 +13,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "SYNC_GUIDE.md",
+                "file": "02 Sec/01 InformationCollection/07 其他产品.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "SYNC_GUIDE"
+              "title": "07 其他产品"
             }
           }
         ]
@@ -185,6 +185,20 @@
   },
   "active": "47c6feeee8915f8b",
   "lastOpenFiles": [
+    "02 Sec/01 InformationCollection/06 微信公众号.md",
+    "02 Sec/01 InformationCollection/07 其他产品.md",
+    "02 Sec/01 InformationCollection/08 工具项目.md",
+    "02 Sec/01 InformationCollection/05 小程序应用.md",
+    "02 Sec/01 InformationCollection/04 APP应用.md",
+    "02 Sec/01 InformationCollection/03  主机服务器.md",
+    "02 Sec/01 InformationCollection/01 业务资产.md",
+    "02 Sec/01 InformationCollection/02 Web应用.md",
+    "CLAUDE.md",
+    "02 Sec/02 Web/02 渗透测试框架.md",
+    "02 Sec/02 Web/01 Web漏洞扫描工具.md",
+    "SYNC_GUIDE.md",
+    "02 Sec/01 InformationCollection/01 Information Gathering.md",
+    "README.md",
     "02 Sec/13 Tool/04 SqlMap.md",
     "02 Sec/13 Tool/03 BurpSuite.md",
     "01 Link/{EFF65EC0-64BA-4E14-AC5C-DA4FB11C55C1}.png",
